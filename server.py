@@ -2,6 +2,7 @@ import re
 from flask import Flask, render_template, request
 import random
 import pymongo
+from datetime import datetime
 TABLE_NUMBER=[]
 # Flask app initialization
 app = Flask(__name__)
@@ -76,9 +77,6 @@ def order_page():
     else:
         return "BYE"
 
-# Route for submitting orders
-from flask import request, render_template
-
 # @app.route('/submit_order', methods=['POST'])
 # def submit_order():
 #     if request.method == 'POST':
@@ -87,7 +85,8 @@ from flask import request, render_template
         
 #         order_details = {
 #             'table_number': TABLE_NUMBER[0],
-#             'items': {item:quantity for item, quantity in quantities.items()}
+#             'items': {item:quantity for item, quantity in quantities.items()},
+#             'datetime': datetime.now()  # Add current date and time
 #         }
 #         order_collection.insert_one(order_details)
 
@@ -98,6 +97,7 @@ from flask import request, render_template
 #                     total_price += items[item] * quantity
 #                     break
 #         return render_template('OrderSuccess.html', quantities=quantities, total_price=total_price, ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
+from bson import ObjectId
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
@@ -105,11 +105,19 @@ def submit_order():
         selected_items = request.form.getlist('item')
         quantities = {item: int(request.form.get(f'{item}_quantity', 0)) for item in selected_items}
         
-        order_details = {
-            'table_number': TABLE_NUMBER[0],
-            'items': {item:quantity for item, quantity in quantities.items()}
-        }
-        order_collection.insert_one(order_details)
+        # Check if an order already exists for the table number
+        existing_order = order_collection.find_one({'table_number': TABLE_NUMBER[0]})
+        if existing_order:
+            
+            return "<script>alert('An order already exists for this table. You cannot add a new order until the existing one is Finished!!')</script>"
+        else:
+            # Create a new order
+            order_details = {
+                'table_number': TABLE_NUMBER[0],
+                'items': {item:quantity for item, quantity in quantities.items()},
+                'datetime': datetime.now()  # Add current date and time
+            }
+            order_collection.insert_one(order_details)
 
         total_price = 0
         for item, quantity in quantities.items():
@@ -171,28 +179,28 @@ def Billings_and_Managements():
         Order_Thali[order['_id']] = order  # Assuming '_id' is the ID field in your MongoDB document
     return render_template('Billings_and_Managements.html', Order_Thali=Order_Thali)
 # Main function to run the Flask app
-from flask import render_template
-
 @app.route('/view_order_details/<int:table_number>')
 def view_order_details(table_number):
     print("Table Number:", table_number)
     
     # Find matching orders for the given table number
     matching_orders = order_collection.find({'table_number': table_number})
+    list = []
+    vangi = []
+    sankhya = []
+    for item in matching_orders[0]['items'].items():
+        list.append(item)
+    for dish , quentity in list:
+        vangi.append(dish)
+        sankhya.append(quentity)
+    print(vangi)
+    print(sankhya)
     
-    if matching_orders:
-        # Retrieve prices of all dishes from item_collection
-        prices = {}
-        for item_doc in item_collection.find():
-            for category, items in item_doc.items():
-                if category != '_id':
-                    prices.update(items)
-        
-        # If prices are found, render the template with the orders and prices data
-        return render_template('OrderSuccess2.html', orders=matching_orders, prices=prices)
-    else:
-        # If no orders are found, return a message indicating that
-        return "No orders found for table number {}".format(table_number)
-
+    return render_template('OrderSuccess2.html', orders=matching_orders)
+@app.route('/delete_order/<int:table_number>')
+def delete_order(table_number):
+    # mydoc = order_collection.find({'table_number':table_number})
+    order_collection.delete_one({"table_number":table_number})
+    return f'<script>alert("Order of Table Number {table_number} is Deleted!!")</script>'
 if __name__ == "__main__":
     app.run(debug=True)
