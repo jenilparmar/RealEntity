@@ -5,6 +5,8 @@ import pymongo
 from datetime import datetime
 TABLE_NUMBER=[]
 # Flask app initialization
+USERNAME = "Spider_Man"
+PASSWORD = "peter_parker"
 app = Flask(__name__)
 
 # MongoDB initialization
@@ -97,7 +99,7 @@ def order_page():
 #                     total_price += items[item] * quantity
 #                     break
 #         return render_template('OrderSuccess.html', quantities=quantities, total_price=total_price, ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
-from bson import ObjectId
+# from bson import ObjectId
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
@@ -146,9 +148,10 @@ def Management():
     if request.method=="POST":
         username = request.form['username']
         password = request.form['password']
-        if True:  
+        if username == USERNAME and password==PASSWORD:
             return render_template('Management.html',ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
-
+        else:
+            return "Wrong UserName or Password!"
 # Route for removing items
 @app.route('/RemoveItem', methods=["POST"])
 def RemoveItem():
@@ -188,6 +191,7 @@ def view_order_details(table_number):
     list = []
     vangi = []
     sankhya = []
+    bhav  =[]
     for item in matching_orders[0]['items'].items():
         list.append(item)
     for dish , quentity in list:
@@ -195,6 +199,7 @@ def view_order_details(table_number):
         sankhya.append(quentity)
     print(vangi)
     print(sankhya)
+    
     
     return render_template('OrderSuccess2.html', orders=matching_orders)
 @app.route('/delete_order/<int:table_number>')
