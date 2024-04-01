@@ -1,0 +1,74 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-image: url(https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/0a/e4/a9/viva-where-every-corner.jpg?w=1200&h=-1&s=1);
+  background-size: contain;
+  background-position: -65% 99%;
+}
+.container {
+  background-color: transparent;
+
+  width: 90vw;
+  background-color: rgb(37, 37, 37);
+
+  height: 100vh;
+  /* background-color: aliceblue; */
+  clip-path: polygon(0 0, 63% 0, 47% 100%, 0% 100%);
+}
+#Welcome {
+  font-size: 8em;
+  position: relative;
+  top: 10%;
+  left: 1%;
+  font-family: "Quicksand";
+  font-weight: 700;
+  color: wheat;
+}
+.input {
+  background-color: transparent;
+  max-width: 200px;
+  height: 27px;
+  padding: 10px;
+  margin: 7em 11em;
+  text-align: center;
+  border: 3px solid wheat;
+  border-radius: 5px;
+}
+
+.input:focus {
+  color: black;
+  background-color: transparent;
+  outline-color: black;
+  transition: 0.2s;
+  transition-property: box-shadow;
+}
+
+button {
+  padding: 10px 20px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  color: wheat;
+  text-shadow: none;
+  background: transparent;
+  cursor: pointer;
+  box-shadow: transparent;
+  border: 1px solid #ffffff80;
+  transition: 0.5s ease;
+  user-select: none;
+}
+
+#btn {
+  margin: -1em 11em;
+}
+#btn:hover,
+:focus {
+  color: black;
+  background: transparent;
+  border: 1px solid wheat;
+  text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff;
+  box-shadow: 0 0 5px wheat, 0 0 20px wheat, 0 0 50px wheat, 0 0 100px wheat;
+}

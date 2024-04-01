@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bills</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='Bills.css') }}" />
+  </head>
+  <body>
+    <center>
+      <h1>Orders</h1>
+      <div class="container">
+        {% for order_id in Order_Thali.keys()|reverse %} {% set order_details =
+        Order_Thali[order_id] %}
+        <div class="order">
+          <div class="order-header">
+            <center>
+              <p class="table_number">
+                Table Number: {{ order_details.table_number }}
+              </p>
+            </center>
+            <p class="id">Order ID: {{ order_id }}</p>
+          </div>
+          <div class="buttons">
+            <button>Delete Order</button>
+            <br />
+            <button>Complete</button>
+            <br />
+
+            <a href="{{ url_for('view_order_details', table_number= order_details.table_number ) }}"
+              ><button>Order Bill</button></a
+            >
+          </div>
+
+          <div class="list" id="order-list-{{ order_id }}">
+            <center>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for key, value in order_details.items() %} {% if key !=
+                  '_id' and key != 'table_number' %} {% for item, quantity in
+                  order_details[key].items() %}
+                  <tr>
+                    <td>{{ item }}</td>
+                    <td class="center">{{ quantity }}</td>
+                  </tr>
+                  {% endfor %} {% endif %} {% endfor %}
+                </tbody>
+              </table>
+            </center>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </center>
+
+    <script>
+      function printTable(orderId) {
+        var orderListDiv = document.getElementById("order-list-" + orderId);
+        var content = orderListDiv.innerHTML;
+        var printWindow = window.open("", "_blank");
+        printWindow.document.write(
+          "<html><head><title>Print</title></head><body>" +
+            content +
+            "</body></html>"
+        );
+        printWindow.document.close();
+        printWindow.print();
+      }
+    </script>
+  </body>
+</html>

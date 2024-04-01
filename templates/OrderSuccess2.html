@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Details</title>
+    <style>
+      h1 {
+        text-decoration: underline;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <center>
+      <h1>Order Details</h1>
+    </center>
+    <div class="orderdetails">
+      {% for order in orders %}
+      <ul>
+        <li>Order ID: {{ order._id }}</li>
+        <li>Table Number: {{ order.table_number }}</li>
+        <li>Items:</li>
+        <ul>
+          {% for dish, quantity in order['items'].items()%}
+          <li>{{ dish }} :: {{ quantity }}</li>
+          {% endfor %}
+        </ul>
+      </ul>
+      {% endfor %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+ef delete_items(key1, key2):

@@ -1,0 +1,198 @@
+import re
+from flask import Flask, render_template, request
+import random
+import pymongo
+TABLE_NUMBER=[]
+# Flask app initialization
+app = Flask(__name__)
+
+# MongoDB initialization
+client = pymongo.MongoClient("mongodb://localhost:27017")
+db = client["Restaurant"]
+item_collection = db["Items"]
+order_collection = db["Orders"]
+
+# Retrieve existing items from the database
+items_cursor = item_collection.find()
+ITEMS = list(items_cursor)[0]
+del ITEMS["_id"]
+
+# Add item to database function
+def AddToDatabase(thali, dish, price):
+    global ITEMS
+    
+    if thali in ITEMS:
+        ITEMS[thali][dish] = int(price)
+    else:
+        ITEMS[thali] = {dish: int(price)}
+    
+    item_collection.update_one({}, {"$set": ITEMS})
+    print("Added")
+
+# Delete item from database function
+def delete_items(key1, key2):
+    for category, item in zip(key1, key2):
+        item_collection.update_one({}, {"$unset": {category + "." + item: ""}})
+        if not item_collection.find_one({category: {"$exists": True}}):
+            item_collection.update_one({}, {"$unset": {category: ""}})
+    print("Deleted")
+quotes = [
+        "Life is uncertain. Eat dessert first.",
+        "All you need is love. But a little chocolate now and then doesn't hurt.",
+        "There is no sincerer love than the love of food.",
+        "Cooking is like love. It should be entered into with abandon or not at all.",
+        "People who love to eat are always the best people.",
+        "Food is symbolic of love when words are inadequate.",
+        "The only thing I like better than talking about food is eating.",
+        "One cannot think well, love well, sleep well, if one has not dined well.",
+        "Food is our common ground, a universal experience.",
+        "Eat breakfast like a king, lunch like a prince, and dinner like a pauper."
+    ]
+    
+
+@app.route('/')
+def index():
+    q = quotes[random.randint(0,len(quotes)-1)]
+    return render_template('index.html', q=q)
+
+
+@app.route('/items')
+def items():
+    dish = request.args.get('dish')
+    if dish not in ITEMS:
+        return f"Invalid Dish: {dish}"
+    thali_data = ITEMS[dish]
+    return render_template('Items.html', dish=dish, Thali=thali_data)
+
+@app.route('/order_page', methods=["POST"])
+def order_page():
+    if request.method == "POST":
+        table_number = request.form['table_number']
+        q = quotes[random.randint(0,len(quotes)-2)]
+        TABLE_NUMBER.append(int(table_number))
+  
+
+        return render_template('Order.html', ITEMS={key: value for key, value in ITEMS.items() if key != '_id'}, tableNo=table_number, q=q)
+    else:
+        return "BYE"
+
+# Route for submitting orders
+from flask import request, render_template
+
+# @app.route('/submit_order', methods=['POST'])
+# def submit_order():
+#     if request.method == 'POST':
+#         selected_items = request.form.getlist('item')
+#         quantities = {item: int(request.form.get(f'{item}_quantity', 0)) for item in selected_items}
+        
+#         order_details = {
+#             'table_number': TABLE_NUMBER[0],
+#             'items': {item:quantity for item, quantity in quantities.items()}
+#         }
+#         order_collection.insert_one(order_details)
+
+#         total_price = 0
+#         for item, quantity in quantities.items():
+#             for category, items in ITEMS.items():
+#                 if item in items:
+#                     total_price += items[item] * quantity
+#                     break
+#         return render_template('OrderSuccess.html', quantities=quantities, total_price=total_price, ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
+
+@app.route('/submit_order', methods=['POST'])
+def submit_order():
+    if request.method == 'POST':
+        selected_items = request.form.getlist('item')
+        quantities = {item: int(request.form.get(f'{item}_quantity', 0)) for item in selected_items}
+        
+        order_details = {
+            'table_number': TABLE_NUMBER[0],
+            'items': {item:quantity for item, quantity in quantities.items()}
+        }
+        order_collection.insert_one(order_details)
+
+        total_price = 0
+        for item, quantity in quantities.items():
+            for category, items in ITEMS.items():
+                if item in items:
+                    total_price += items[item] * quantity
+                    break
+        return render_template('OrderSuccess.html', quantities=quantities, total_price=total_price, ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
+
+@app.route('/Added' ,methods=["GET","POST"])
+def Added():
+    if request.method=="POST":
+        Thali = request.form['Thali']
+        Dish = request.form['Dish']
+        Price = request.form['Price']
+        AddToDatabase(Thali,Dish,Price)
+        return render_template('Added.html',Thali=Thali,Dish=Dish,Price=Price)
+    else:
+        return "Nothing To Add!!"
+
+# Route for management page
+@app.route('/Management',methods=['POST','GET'])
+def Management():
+    if request.method=="GET":
+        return render_template('Authentication.html')
+    if request.method=="POST":
+        username = request.form['username']
+        password = request.form['password']
+        if True:  
+            return render_template('Management.html',ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
+
+# Route for removing items
+@app.route('/RemoveItem', methods=["POST"])
+def RemoveItem():
+    if request.method == "POST":
+        removed_items = []  # Initialize a list to store removed items
+        key1 = []
+        key2 = []
+        for key, value in request.form.items():
+            if value == 'on':  # Check if the checkbox was checked
+                parts = key.split("-")
+                if len(parts) == 2:  # Ensure exactly two parts after splitting
+                    category, item = parts
+                    key1.append(category.strip())  # Strip extra spaces
+                    key2.append(item.strip())      # Strip extra spaces
+                    removed_items.append(item.strip())  # Add the removed item to the list
+                else:
+                    print(f"Illegal key format: {key}")
+        delete_items(key1=key1, key2=key2)
+        
+        return render_template('RemoveItem.html', removed_items=removed_items)  # Pass removed_items to the template
+    else:
+        return "Nothing to Remove!!"
+@app.route('/Billings_and_Managements')
+def Billings_and_Managements():
+    Order_Thali = {}
+    res = order_collection.find()
+    for order in res:
+        Order_Thali[order['_id']] = order  # Assuming '_id' is the ID field in your MongoDB document
+    return render_template('Billings_and_Managements.html', Order_Thali=Order_Thali)
+# Main function to run the Flask app
+from flask import render_template
+
+@app.route('/view_order_details/<int:table_number>')
+def view_order_details(table_number):
+    print("Table Number:", table_number)
+    
+    # Find matching orders for the given table number
+    matching_orders = order_collection.find({'table_number': table_number})
+    
+    if matching_orders:
+        # Retrieve prices of all dishes from item_collection
+        prices = {}
+        for item_doc in item_collection.find():
+            for category, items in item_doc.items():
+                if category != '_id':
+                    prices.update(items)
+        
+        # If prices are found, render the template with the orders and prices data
+        return render_template('OrderSuccess2.html', orders=matching_orders, prices=prices)
+    else:
+        # If no orders are found, return a message indicating that
+        return "No orders found for table number {}".format(table_number)
+
+if __name__ == "__main__":
+    app.run(debug=True)
