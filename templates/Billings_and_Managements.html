@@ -7,6 +7,9 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='Bills.css') }}" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images.jpeg') }}" />
   </head>
   <body>
     <center>
@@ -48,13 +51,13 @@
 
           <div class="c">
             <a
-            href="{{ url_for('delete_order', table_number = order_details.table_number ) }}">
-            <button>Delete Order</button>
-          </a>
-          <a
-            href="{{ url_for('view_order_details', table_number = order_details.table_number ) }}">
-            <button>Order Bill</button>
-          </a>
+              href="{{ url_for('delete_order', table_number = order_details.table_number ) }}">
+              <button>Delete Order</button>
+            </a>
+            <a
+              href="{{ url_for('view_order_details', table_number = order_details.table_number ) }}">
+              <button>Order Bill</button>
+            </a>
           </div>
         </div>
         {% endfor %}

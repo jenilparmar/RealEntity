@@ -3,16 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tadka</title>
+    <title>Restaurant</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images.jpeg') }}" />
   </head>
   <body>
     <div class="container">
       <form action="/order_page" method="post">
         <p id="Welcome">Welcome</p>
-        <input placeholder="Table No." class="input" name="table_number" type="number" />
+        <input
+          placeholder="Table No."
+          class="input"
+          name="table_number"
+          type="number" />
 
         <br />
 
