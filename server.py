@@ -182,26 +182,67 @@ def Billings_and_Managements():
         Order_Thali[order['_id']] = order  # Assuming '_id' is the ID field in your MongoDB document
     return render_template('Billings_and_Managements.html', Order_Thali=Order_Thali)
 # Main function to run the Flask app
+# @app.route('/view_order_details/<int:table_number>')
+# def view_order_details(table_number):
+#     print("Table Number:", table_number)
+    
+#     # Find matching orders for the given table number
+#     matching_orders = order_collection.find({'table_number': table_number})
+#     list = []
+#     vangi = []
+#     sankhya = []
+#     bhav  =[]
+#     for item in matching_orders[0]['items'].items():
+#         list.append(item)
+#     for dish , quentity in list:
+#         vangi.append(dish)
+#         sankhya.append(quentity)
+#     print(vangi)
+#     x=0
+#     dc = {}    
+#     for i in item_collection.find():
+#             for j in i:
+#                 if x==0:    
+#                     x = 1
+#                     continue
+#                 for k in i[j]:
+#                     dc[k] = i[j][k] 
+    
+#     print(dc)
+#     return render_template('OrderSuccess2.html', orders=matching_orders ,vangi=vangi,dc=dc)
+
+from flask import render_template
+
 @app.route('/view_order_details/<int:table_number>')
 def view_order_details(table_number):
     print("Table Number:", table_number)
     
     # Find matching orders for the given table number
     matching_orders = order_collection.find({'table_number': table_number})
-    list = []
-    vangi = []
-    sankhya = []
-    bhav  =[]
-    for item in matching_orders[0]['items'].items():
-        list.append(item)
-    for dish , quentity in list:
-        vangi.append(dish)
-        sankhya.append(quentity)
-    print(vangi)
-    print(sankhya)
     
+    # Extracting dishes and quantities from matching orders
+    dishes_quantities = matching_orders[0]['items']
     
-    return render_template('OrderSuccess2.html', orders=matching_orders)
+    vangi = [dish for dish, quantity in dishes_quantities.items()]
+    quantities = [quantity for dish, quantity in dishes_quantities.items()]
+    
+    # Fetching prices of dishes
+    dc = {}
+    x = 0
+    for i in item_collection.find():
+        for j in i:
+            if x == 0:
+                x = 1
+                continue
+            for k in i[j]:
+                dc[k] = i[j][k]
+    
+    # Calculating total amount for each dish
+    total_amount = sum([dc[dish] * quantities[vangi.index(dish)] for dish in vangi])
+    print(total_amount)
+    return render_template('OrderSuccess2.html', orders=matching_orders, vangi=vangi, dc=dc, quantities=quantities, total_amount=total_amount)
+
+
 @app.route('/delete_order/<int:table_number>')
 def delete_order(table_number):
     # mydoc = order_collection.find({'table_number':table_number})

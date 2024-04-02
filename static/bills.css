@@ -67,15 +67,6 @@ thead {
 .center {
   text-align: center;
 }
-.buttons {
-  background-color: transparent;
-  gap: 2em;
-  margin: 5em 0;
-  display: flex;
-  flex-direction: row;
-  height: fit-content;
-
-}
 
 button {
   width: 24vw;
@@ -84,10 +75,10 @@ button {
   border: 2px solid wheat;
   background-color: transparent;
   color: wheat;
-  margin: 1.5em 0;
+  margin: 1.5em 18px;
   position: relative;
-  right: -78%;
-  bottom: -240%;
+  right: -313%;
+  bottom: -4%;
   transition: all ease 0.4s;
 }
 button:hover {
@@ -100,11 +91,25 @@ button:hover {
 }
 .list {
   position: relative;
-  right: -17%;
+  right: -15%;
   width: fit-content;
   height: fit-content;
   margin-top: 2em;
 }
 tr {
   font-size: 1.2em;
+}
+a {
+  display: inline-block;
+  content: layout;
+  position: relative;
+  top: 10%;
+  right: 76%;
+}
+td {
+  text-align: center;
+}
+.c {
+  display: flex;
+  flex-direction: row;
 }

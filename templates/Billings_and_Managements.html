@@ -22,18 +22,6 @@
               </p>
             </center>
           </div>
-          <div class="buttons">
-            <a
-              href="{{ url_for('delete_order', table_number = order_details.table_number ) }}">
-              <button>Delete Order</button>
-            </a>
-            <br />
-
-            <a
-              href="{{ url_for('view_order_details', table_number = order_details.table_number ) }}">
-              <button>Order Bill</button>
-            </a>
-          </div>
 
           <div class="list" id="order-list-{{ order_id }}">
             <center>
@@ -50,12 +38,23 @@
                   for item, quantity in order_details[key].items() %}
                   <tr>
                     <td>{{ item }}</td>
-                    <td class="center">{{ quantity }}</td>
+                    <td>{{ quantity }}</td>
                   </tr>
                   {% endfor %} {% endif %} {% endfor %}
                 </tbody>
               </table>
             </center>
+          </div>
+
+          <div class="c">
+            <a
+            href="{{ url_for('delete_order', table_number = order_details.table_number ) }}">
+            <button>Delete Order</button>
+          </a>
+          <a
+            href="{{ url_for('view_order_details', table_number = order_details.table_number ) }}">
+            <button>Order Bill</button>
+          </a>
           </div>
         </div>
         {% endfor %}
