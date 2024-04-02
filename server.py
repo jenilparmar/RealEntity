@@ -6,7 +6,7 @@ from datetime import datetime
 TABLE_NUMBER=[]
 # Flask app initialization
 USERNAME = "Spider_Man"
-PASSWORD = "peter_parker"
+PASSWORD = "Mary_Jane"
 app = Flask(__name__)
 
 # MongoDB initialization
