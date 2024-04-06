@@ -9,8 +9,7 @@ TABLE_NUMBER=[]
 USERNAME = "Spider_Man"
 PASSWORD = "Mary_Jane"
 app = Flask(__name__)
-
-CONNECTIONSTRING = os.environ.get('DongoMb_WassPord')
+CONNECTIONSTRING="mongodb+srv://jerryhash231:4ZtcY6TjwfpgIYcR@cluster0.zoxlymw.mongodb.net/"
 
 # MongoDB initialization
 client = pymongo.MongoClient(CONNECTIONSTRING)
