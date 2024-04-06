@@ -200,5 +200,5 @@ def delete_order(table_number):
     # mydoc = order_collection.find({'table_number':table_number})
     order_collection.delete_one({"table_number":table_number})
     return f'<script>alert("Order of Table Number {table_number} is Deleted!!")</script>'
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
