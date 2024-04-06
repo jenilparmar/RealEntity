@@ -1,3 +1,4 @@
+import os
 import re
 from flask import Flask, render_template, request
 import random
@@ -9,8 +10,10 @@ USERNAME = "Spider_Man"
 PASSWORD = "Mary_Jane"
 app = Flask(__name__)
 
+CONNECTIONSTRING = os.environ.get('DongoMb_WassPord')
+
 # MongoDB initialization
-client = pymongo.MongoClient("mongodb://localhost:27017")
+client = pymongo.MongoClient(CONNECTIONSTRING)
 db = client["Restaurant"]
 item_collection = db["Items"]
 order_collection = db["Orders"]
@@ -78,28 +81,6 @@ def order_page():
         return render_template('Order.html', ITEMS={key: value for key, value in ITEMS.items() if key != '_id'}, tableNo=table_number, q=q)
     else:
         return "BYE"
-
-# @app.route('/submit_order', methods=['POST'])
-# def submit_order():
-#     if request.method == 'POST':
-#         selected_items = request.form.getlist('item')
-#         quantities = {item: int(request.form.get(f'{item}_quantity', 0)) for item in selected_items}
-        
-#         order_details = {
-#             'table_number': TABLE_NUMBER[0],
-#             'items': {item:quantity for item, quantity in quantities.items()},
-#             'datetime': datetime.now()  # Add current date and time
-#         }
-#         order_collection.insert_one(order_details)
-
-#         total_price = 0
-#         for item, quantity in quantities.items():
-#             for category, items in ITEMS.items():
-#                 if item in items:
-#                     total_price += items[item] * quantity
-#                     break
-#         return render_template('OrderSuccess.html', quantities=quantities, total_price=total_price, ITEMS={key: value for key, value in ITEMS.items() if key != '_id'})
-# from bson import ObjectId
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
@@ -181,35 +162,6 @@ def Billings_and_Managements():
     for order in res:
         Order_Thali[order['_id']] = order  # Assuming '_id' is the ID field in your MongoDB document
     return render_template('Billings_and_Managements.html', Order_Thali=Order_Thali)
-# Main function to run the Flask app
-# @app.route('/view_order_details/<int:table_number>')
-# def view_order_details(table_number):
-#     print("Table Number:", table_number)
-    
-#     # Find matching orders for the given table number
-#     matching_orders = order_collection.find({'table_number': table_number})
-#     list = []
-#     vangi = []
-#     sankhya = []
-#     bhav  =[]
-#     for item in matching_orders[0]['items'].items():
-#         list.append(item)
-#     for dish , quentity in list:
-#         vangi.append(dish)
-#         sankhya.append(quentity)
-#     print(vangi)
-#     x=0
-#     dc = {}    
-#     for i in item_collection.find():
-#             for j in i:
-#                 if x==0:    
-#                     x = 1
-#                     continue
-#                 for k in i[j]:
-#                     dc[k] = i[j][k] 
-    
-#     print(dc)
-#     return render_template('OrderSuccess2.html', orders=matching_orders ,vangi=vangi,dc=dc)
 
 from flask import render_template
 
